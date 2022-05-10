@@ -7,8 +7,8 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { 
-	delete model_; 
+GameScene::~GameScene() {
+	delete model_;
 	delete debugCamera_;
 }
 
@@ -69,11 +69,11 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 
-	// 3Dモデル描画
+// 3Dモデル描画
 	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
 	// ライン描画が参照するビュープロジェクションを指定する（アドレス渡し）
 	const int MAX_LINE = 3;
-	Vector3 p1_[MAX_LINE] = { 
+	Vector3 p1_[MAX_LINE] = {
 		{0,0,0},
 		{0,0,0},
 		{0,0,0}
@@ -83,10 +83,10 @@ void GameScene::Draw() {
 		{0,50,0},
 		{0,0,50},
 	};
-	Vector4 color_[MAX_LINE] = { 
-		{255,0,0,100}, 
-		{0,255,0,100}, 
-		{0,0,255,100}, 
+	Vector4 color_[MAX_LINE] = {
+		{255,0,0,100},
+		{0,255,0,100},
+		{0,0,255,100},
 	};
 	for (int i = 0; i < MAX_LINE; i++) {
 		PrimitiveDrawer::GetInstance()->DrawLine3d(p1_[i], p2_[i], color_[i]);
