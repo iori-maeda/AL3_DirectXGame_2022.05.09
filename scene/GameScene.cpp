@@ -4,6 +4,7 @@
 
 #include"AxisIndicator.h"
 #include"PrimitiveDrawer.h"
+#include<random>
 
 // 円周率
 const float PI = 3.1415f;
@@ -73,6 +74,13 @@ void GameScene::Initialize() {
 
 	// 行列計算と合成
 	MatSyntheticZXY(worldTransform_);
+
+	// 乱数シード生成器
+	std::random_device seed_gen;
+	// メルセンヌ・ツイスターの乱数エンジン
+	std::mt19937_64 engin(seed_gen());
+	// 乱数範囲の指定
+	std::uniform_real_distribution<float> dist(10, -10);
 }
 
 void GameScene::Update() {

@@ -58,7 +58,7 @@ class GameScene {
 	// 3Dモデル
 	Model* model_ = nullptr;
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[100];
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 	// デバッグカメラ
