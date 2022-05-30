@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 	//3D生成
 	model_ = Model::Create();
 	//ワールドトランスフォームの初期化
-	worldTranform_.Initialize();
+	worldTransform_.Initialize();
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 }
@@ -53,7 +53,7 @@ void GameScene::Draw() {
 	/// </summary>
 
 	//3Dモデル描画
-	model_->Draw(worldTranform_, viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
