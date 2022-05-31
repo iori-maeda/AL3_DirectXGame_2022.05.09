@@ -34,6 +34,8 @@ float LowerLimit(const float& num, const float& limit);
 float Clamp(const float& num, const float& min, const float& max);
 
 
+// 親から順に更新処理
+void UpdateWorldTransform(WorldTransform& worldTransform);
 
 GameScene::GameScene() {}
 
@@ -45,9 +47,96 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	// ファイル名を指定してテクスチャを読み込む
+	textureHandle_ = TextureManager::Load("mario.jpg");
+	// 3Dモデル生成
+	model_ = Model::Create();
+	// ビュープロジェクションの初期化
+	viewProjection_.Initialize();
+
+	// ワールドトランスフォームの初期化
+	// キャラクター大元
+	worldTransform_[PartID::kRoot].Initialize();
+	// 脊椎
+	worldTransform_[PartID::kSpine].Initialize();
+	worldTransform_[PartID::kSpine].parent_ = &worldTransform_[PartID::kRoot];
+	worldTransform_[PartID::kSpine].translation_ = { 0,0,0 };
+
+
+	const float limbsWidth = 3;
+	const float linmbsHeight = 3;
+	// 上半身
+	// 胴
+	worldTransform_[PartID::kChest].Initialize();
+	worldTransform_[PartID::kChest].parent_ = &worldTransform_[PartID::kSpine];
+	worldTransform_[PartID::kChest].translation_ = { 0,0,0 };
+	// 頭
+	worldTransform_[PartID::kHead].Initialize();
+	worldTransform_[PartID::kHead].parent_ = &worldTransform_[PartID::kChest];
+	worldTransform_[PartID::kHead].translation_ = { 0,linmbsHeight,0 };
+	// 左腕
+	worldTransform_[PartID::kArmL].Initialize();
+	worldTransform_[PartID::kArmL].parent_ = &worldTransform_[PartID::kChest];
+	worldTransform_[PartID::kArmL].translation_ = { -limbsWidth,0,0 };
+	// 右腕
+	worldTransform_[PartID::kArmR].Initialize();
+	worldTransform_[PartID::kArmR].parent_ = &worldTransform_[PartID::kChest];
+	worldTransform_[PartID::kArmR].translation_ = { limbsWidth,0,0 };
+
+	// 下半身
+	// 尻
+	worldTransform_[PartID::kHip].Initialize();
+	worldTransform_[PartID::kHip].parent_ = &worldTransform_[PartID::kSpine];
+	worldTransform_[PartID::kHip].translation_ = { 0,-linmbsHeight,0 };
+	// 左足
+	worldTransform_[PartID::kLegL].Initialize();
+	worldTransform_[PartID::kLegL].parent_ = &worldTransform_[PartID::kHip];
+	worldTransform_[PartID::kLegL].translation_ = { -limbsWidth,-linmbsHeight,0 };
+	// 右足
+	worldTransform_[PartID::kLegR].Initialize();
+	worldTransform_[PartID::kLegR].parent_ = &worldTransform_[PartID::kHip];
+	worldTransform_[PartID::kLegR].translation_ = { limbsWidth,-linmbsHeight,0 };
+	
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	// キャラクター移動処理
+	{
+		// キャラクターの移動ベクトル
+		Vector3 move = { 0,0,0 };
+		
+		// 左か右キーを押していたらmove(移動量)を変化
+		if (input_->PushKey(DIK_LEFT))move.x -= 0.5f;
+		else if (input_->PushKey(DIK_RIGHT))move.x += 0.5f;
+
+		// 移動量を加算
+		worldTransform_[PartID::kRoot].translation_ += move;
+		
+		// デバッグ用表示
+		debugText_->SetPos(50, 50);
+		debugText_->Printf("translation:(%f,%f,%f)", worldTransform_[PartID::kRoot].translation_.x,
+			worldTransform_[PartID::kRoot].translation_.y, worldTransform_[PartID::kRoot].translation_.z);
+
+	}
+	// 子の更新
+	for (int i = 0; i < PartID::kNumPartId; i++) {
+		UpdateWorldTransform(worldTransform_[i]);
+	}
+	// 上半身回転処理
+	{
+		// 押した方向で移動ベクトルを変更
+		if (input_->PushKey(DIK_U))worldTransform_[PartID::kChest].rotation_.y -= ConvartToRadian(1);
+		else if (input_->PushKey(DIK_I))worldTransform_[PartID::kChest].rotation_.y += ConvartToRadian(1);
+	}
+	// 下半身回転処理
+	{
+		// 押した方向で移動ベクトルを変更
+		if (input_->PushKey(DIK_J))worldTransform_[PartID::kHip].rotation_.y -= ConvartToRadian(1);
+		else if (input_->PushKey(DIK_K))worldTransform_[PartID::kHip].rotation_.y += ConvartToRadian(1);
+	}
+} 
+
 
 void GameScene::Draw() {
 
@@ -75,7 +164,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	
+	for (int i = PartID::kChest; i < PartID::kNumPartId; i++) {
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -181,4 +273,11 @@ float Clamp(const float& num, const float& min, const float& max) {
 	if (num <= min) return min;
 	else if (num >= max)return max;
 	return num;
+}
+
+// 親から順に更新処理
+void UpdateWorldTransform(WorldTransform& worldTransform) {
+		MatSyntheticZXY(worldTransform);
+		if (worldTransform.parent_ != nullptr) worldTransform.matWorld_ *= worldTransform.parent_->matWorld_;
+		worldTransform.TransferMatrix();
 }

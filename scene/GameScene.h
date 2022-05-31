@@ -50,4 +50,30 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0;
+	// 3Dモデル
+	Model* model_ = nullptr;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+	// ワールドトランスフォーム
+	WorldTransform worldTransform_[100];
+
+
+public:
+	// パーツID
+	enum PartID {
+		kRoot,	// 大元
+		kSpine,	// 脊椎
+		kChest,	// 胴
+		kHead,	// 頭
+		kArmL,	// 左腕
+		kArmR,	// 右腕
+		kHip,	// 尻
+		kLegL,	// 左足
+		kLegR,	// 右足
+
+		kNumPartId // ID総数
+	};
 };
