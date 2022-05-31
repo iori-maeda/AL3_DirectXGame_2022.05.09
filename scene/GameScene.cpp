@@ -33,8 +33,9 @@ float ConvartToDegree(const float radian) {
 }
 
 // 限界値設定
-float UpperLimit(const float& y, const float& limit);
-float LowerLimit(const float& y, const float& limit);
+float UpperLimit(const float& num, const float& limit);
+float LowerLimit(const float& num, const float& limit);
+float Clamp(const float& num, const float& min, const float& max);
 
 GameScene::GameScene() {}
 
@@ -163,12 +164,13 @@ void GameScene::Update() {
 		// 上キーで視野角が広がる
 		if (input_->PushKey(DIK_UP)) {
 			viewProjection_.fovAngleY += ConvartToRadian(5);
-			viewProjection_.fovAngleY = UpperLimit(viewProjection_.fovAngleY, ConvartToRadian(180));
+			//viewProjection_.fovAngleY = UpperLimit(viewProjection_.fovAngleY, ConvartToRadian(180));
 		}
 		else if (input_->PushKey(DIK_DOWN)) {
 			viewProjection_.fovAngleY -= ConvartToRadian(5);
-			viewProjection_.fovAngleY = LowerLimit(viewProjection_.fovAngleY, ConvartToRadian(0.01f));
+			//viewProjection_.fovAngleY = LowerLimit(viewProjection_.fovAngleY, ConvartToRadian(0.01f));
 		}
+		viewProjection_.fovAngleY = Clamp(viewProjection_.fovAngleY, ConvartToRadian(0.01f), ConvartToRadian(180));
 		// 行列の再計算
 		viewProjection_.UpdateMatrix();
 		// デバッグ用表示
@@ -330,12 +332,18 @@ void MatSyntheticZXY(WorldTransform& worldTransform_) {
 }
 
 // 限界値設定関数
-float UpperLimit(const float& y, const float& limit) {
-	if (y >= limit)return limit;
-	return y;
+float UpperLimit(const float& num, const float& limit) {
+	if (num >= limit)return limit;
+	return num;
 }
 
-float LowerLimit(const float& y, const float& limit) {
-	if (y <= limit)return limit;
-	return y;
+float LowerLimit(const float& num, const float& limit) {
+	if (num <= limit)return limit;
+	return num;
+}
+
+float Clamp(const float& num, const float& min, const float& max) {
+	if (num <= min) return min;
+	else if (num >= max)return max;
+	return num;
 }
