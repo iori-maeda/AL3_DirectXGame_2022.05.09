@@ -24,10 +24,6 @@ Matrix4 MatTrans(const Vector3& translation_);
 // 行列のZXY合成
 void MatSyntheticZXY(WorldTransform& worldTransform_);
 
-// 限界値設定
-float UpperLimit(const float& y, const float& limit);
-float LowerLimit(float y, float limit);
-
 // ラジアンに変換
 float ConvartToRadian(const float degree) {
 	return (degree * PI) / 180;
@@ -35,6 +31,10 @@ float ConvartToRadian(const float degree) {
 float ConvartToDegree(const float radian) {
 	return radian * 180 / PI;
 }
+
+// 限界値設定
+float UpperLimit(const float& y, const float& limit);
+float LowerLimit(const float& y, const float& limit);
 
 GameScene::GameScene() {}
 
@@ -335,7 +335,7 @@ float UpperLimit(const float& y, const float& limit) {
 	return y;
 }
 
-float LowerLimit(float y, float limit) {
+float LowerLimit(const float& y, const float& limit) {
 	if (y <= limit)return limit;
 	return y;
 }
