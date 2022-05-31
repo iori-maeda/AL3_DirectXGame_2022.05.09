@@ -21,9 +21,12 @@ Matrix4 MatRotY(const float& rotY);
 Matrix4 MatRotZ(const float& rotZ);
 // 平行移動行列
 Matrix4 MatTrans(const Vector3& translation_);
-
 // 行列のZXY合成
 void MatSyntheticZXY(WorldTransform& worldTransform_);
+
+// 限界値設定
+float UpperLimit(const float& y, const float& limit);
+float LowerLimit(float y, float limit);
 
 // ラジアンに変換
 float ConvartToRadian(const float degree) {
@@ -56,6 +59,14 @@ void GameScene::Initialize() {
 	// カメラ注視点座標を設定
 	viewProjection_.target = { 10,0,0 };
 	viewProjection_.up = { cosf(ConvartToRadian(45)),sinf(ConvartToRadian(45)),0 };
+	// カメラの垂直方向視野角を設定
+	viewProjection_.fovAngleY = ConvartToRadian(10);
+	// アスペクト比を設定
+	viewProjection_.aspectRatio = 1;
+	// ニアクリップ距離を設定
+	viewProjection_.nearZ = 52;
+	// ファークリップ距離を設定
+	viewProjection_.farZ = 53;
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 	// 軸方向表示の表示を有効にする
@@ -94,7 +105,7 @@ void GameScene::Update() {
 		// 視点の移動ベクトル
 		Vector3 move = { 0,0,0 };
 		// 視点の移動速度
-		const float kEyeSpeed = 0.2;
+		const float kEyeSpeed = 0.2f;
 		// 押した方向で移動ベクトルを変更
 		if (input_->PushKey(DIK_W))move.z += kEyeSpeed;
 		else if (input_->PushKey(DIK_S))move.z -= kEyeSpeed;
@@ -113,7 +124,7 @@ void GameScene::Update() {
 		// 注視点の移動ベクトル
 		Vector3 move = { 0,0,0 };
 		// 注視点の移動速度
-		const float kTargetSpeed = 0.2;
+		const float kTargetSpeed = 0.2f;
 		// 押した方向で移動ベクトルを変更
 		if (input_->PushKey(DIK_LEFT))move.x -= kTargetSpeed;
 		else if (input_->PushKey(DIK_RIGHT))move.x += kTargetSpeed;
@@ -130,7 +141,7 @@ void GameScene::Update() {
 	// 上方向回転処理
 	{
 		// 上方向の回転速度[ラジアン/frame]1
-		const float kUpSpeed = 0.05;
+		const float kUpSpeed = 0.05f;
 		// 押した方向で移動ベクトルを変更
 		if (input_->PushKey(DIK_SPACE)) {
 			viewAngle += kUpSpeed;
@@ -146,6 +157,35 @@ void GameScene::Update() {
 		debugText_->Printf(
 			"up:(%f,%f,%f)", viewProjection_.up.x,
 			viewProjection_.up.y, viewProjection_.up.z);
+	}
+	// FoV変更処理
+	{
+		// 上キーで視野角が広がる
+		if (input_->PushKey(DIK_UP)) {
+			viewProjection_.fovAngleY += ConvartToRadian(5);
+			viewProjection_.fovAngleY = UpperLimit(viewProjection_.fovAngleY, ConvartToRadian(180));
+		}
+		else if (input_->PushKey(DIK_DOWN)) {
+			viewProjection_.fovAngleY -= ConvartToRadian(5);
+			viewProjection_.fovAngleY = LowerLimit(viewProjection_.fovAngleY, ConvartToRadian(0.01f));
+		}
+		// 行列の再計算
+		viewProjection_.UpdateMatrix();
+		// デバッグ用表示
+		debugText_->SetPos(50, 110);
+		debugText_->Printf(
+			"fovAngleY(Degree):%f", ConvartToDegree(viewProjection_.fovAngleY));
+	}
+	// クリップ距離変更処理
+	{
+		// 上下キーでニアクリップ距離を増減
+		if (input_->PushKey(DIK_UP))viewProjection_.nearZ += 0.5f;
+		else if (input_->PushKey(DIK_DOWN))viewProjection_.nearZ -= 0.5f;
+		// 行列の再計算
+		viewProjection_.UpdateMatrix();
+		// デバッグ用表示
+		debugText_->SetPos(50, 130);
+		debugText_->Printf("nearZ:%f", viewProjection_.nearZ);
 	}
 }
 
@@ -287,4 +327,15 @@ void MatSyntheticZXY(WorldTransform& worldTransform_) {
 	worldTransform_.matWorld_ *= MatTrans(worldTransform_.translation_);
 	// 行列の転送
 	worldTransform_.TransferMatrix();
+}
+
+// 限界値設定関数
+float UpperLimit(const float& y, const float& limit) {
+	if (y >= limit)return limit;
+	return y;
+}
+
+float LowerLimit(float y, float limit) {
+	if (y <= limit)return limit;
+	return y;
 }
