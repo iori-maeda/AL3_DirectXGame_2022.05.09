@@ -10,6 +10,9 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 
+#include"../scene/Player/Player.h"
+#include <3d/DebugCamera.h>
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -57,23 +60,13 @@ class GameScene {
 	Model* model_ = nullptr;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
-	// ワールドトランスフォーム
-	WorldTransform worldTransform_[100];
 
+	// デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
 
-public:
-	// パーツID
-	enum PartID {
-		kRoot,	// 大元
-		kSpine,	// 脊椎
-		kChest,	// 胴
-		kHead,	// 頭
-		kArmL,	// 左腕
-		kArmR,	// 右腕
-		kHip,	// 尻
-		kLegL,	// 左足
-		kLegR,	// 右足
+	// 自キャラ
+	Player* player_ = nullptr;
 
-		kNumPartId // ID総数
-	};
+	// デバッグカメラ有効判定
+	bool isDubugCameraActive_ = false;
 };
