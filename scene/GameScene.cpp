@@ -4,6 +4,7 @@
 
 
 #include"PrimitiveDrawer.h"
+#include"UtilityFunction.h"
 
 GameScene::GameScene() {}
 
@@ -105,22 +106,12 @@ void GameScene::Draw() {
 			player_->GetWorldTransform().translation_.x,
 			player_->GetWorldTransform().translation_.y,
 			player_->GetWorldTransform().translation_.z };
-		Vector3 endPosX = {
-			player_->GetWorldTransform().translation_.x + 50,
-			player_->GetWorldTransform().translation_.y,
-			player_->GetWorldTransform().translation_.z };
-		Vector3 endPosY = {
-			player_->GetWorldTransform().translation_.x,
-			player_->GetWorldTransform().translation_.y + 50,
-			player_->GetWorldTransform().translation_.z };
-		Vector3 endPosZ = {
-			player_->GetWorldTransform().translation_.x,
-			player_->GetWorldTransform().translation_.y,
-			player_->GetWorldTransform().translation_.z + 50 };
-		
-		PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosX, { 0xff0000,0x000000,0x000000,0xffffff });
-		PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosY, { 0x000000,0x00ff00,0x000000,0xffffff });
-		PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosZ, { 0x000000,0x000000,0x0000ff,0xffffff });
+		Vector3 endPos = {
+			startPos.x + 50,
+			startPos.y + 50,
+			startPos.z + 50,
+		};
+		DrawXYZLine3DRGB(startPos, endPos);
 	}
 	else {
 		player_->Draw(viewProjection_);

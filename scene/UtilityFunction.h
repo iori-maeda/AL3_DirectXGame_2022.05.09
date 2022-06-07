@@ -34,3 +34,6 @@ float Clamp(const float& num, const float& min, const float& max);
 
 // 親から順に更新処理
 void UpdateWorldTransform(WorldTransform& worldTransform);
+
+//　ライン描画のラッピング関数
+void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen);

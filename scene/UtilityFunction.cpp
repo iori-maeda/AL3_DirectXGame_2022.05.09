@@ -1,6 +1,7 @@
 #include"UtilityFunction.h"
 #include <math/MathUtility.h>
 #include <cmath>
+#include"PrimitiveDrawer.h"
 
 
 // 関数群定義
@@ -102,4 +103,26 @@ void UpdateWorldTransform(WorldTransform& worldTransform) {
 	MatSyntheticZXY(worldTransform);
 	if (worldTransform.parent_ != nullptr) worldTransform.matWorld_ *= worldTransform.parent_->matWorld_;
 	worldTransform.TransferMatrix();
+}
+
+// ライン描画のラッピング関数
+void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen) {
+	Vector3 endPosX = {
+		startPos.x + endPosLen.x,
+		startPos.y,
+		startPos.z
+	};
+	Vector3 endPosY = {
+		startPos.x,
+		startPos.y + endPosLen.y,
+		startPos.z
+	};
+	Vector3 endPosZ = {
+		startPos.x,
+		startPos.y,
+		startPos.z + endPosLen.z
+	};
+	PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosX, { 0xff0000,0x000000,0x000000,0xffffff });
+	PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosY, { 0x000000,0x00ff00,0x000000,0xffffff });
+	PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosZ, { 0x000000,0x000000,0x0000ff,0xffffff });
 }
