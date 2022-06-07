@@ -37,3 +37,6 @@ void UpdateWorldTransform(WorldTransform& worldTransform);
 
 //　ライン描画のラッピング関数
 void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen);
+
+// 線形補完
+float Lerp(const float& start, const float& end, float time);

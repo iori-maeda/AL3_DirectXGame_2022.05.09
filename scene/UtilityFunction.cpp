@@ -126,3 +126,7 @@ void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen) {
 	PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosY, { 0x000000,0x00ff00,0x000000,0xffffff });
 	PrimitiveDrawer::GetInstance()->DrawLine3d(startPos, endPosZ, { 0x000000,0x000000,0x0000ff,0xffffff });
 }
+
+float Lerp(const float& start, const float& end, float time) {
+	return start + time * (end - start);
+}

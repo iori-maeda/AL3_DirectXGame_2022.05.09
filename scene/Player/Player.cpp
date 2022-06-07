@@ -36,8 +36,18 @@ void Player::Update() {
 	// ”ÍˆÍŒÀ’èˆ—
 	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);
 	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
-	
 
+	Vector3 rotate = { 0.5f,45,0.5f };
+	Rotate(move, rotate);
+
+	// UŒ‚ˆ—
+	Attack();
+
+	// ’e‚ÌXV
+	if (bullet_) {
+		bullet_->Update();
+	}
+	
 	MatSyntheticZXY(worldTransform_);
 	worldTransform_.translation_ += move;
 	worldTransform_.TransferMatrix();
@@ -46,10 +56,56 @@ void Player::Update() {
 	debugText_->SetPos(50, 50);
 	debugText_->Printf(
 		"playerPos:(%f,%f,%f)",worldTransform_.translation_.x,
-		worldTransform_.translation_.y, worldTransform_.translation_.z);
+		worldTransform_.rotation_.y, worldTransform_.translation_.z);
 }
 
+void Player::Rotate(const Vector3& moveState, const Vector3& rotate) {
+	Vector3 rotation = {
+		ConvartToRadian(rotate.x),
+		ConvartToRadian(rotate.y),
+		ConvartToRadian(rotate.z)
+	};
+	Vector3 rot = {
+		rotation.x / 10,
+		rotation.y / 10,
+		rotation.z / 10,
+	};
+	if (moveState.x > 0) {
+		worldTransform_.rotation_.y -= rotation.y / 3;
+	}
+	else if (moveState.x < 0) {
+		worldTransform_.rotation_.y += rotation.y / 3;
+	}
+	worldTransform_.rotation_.y = Clamp(worldTransform_.rotation_.y, -rotation.y, rotation.y);
+	if (moveState.x == 0) {
+		if (worldTransform_.rotation_.y > 0) {
+			worldTransform_.rotation_.y -= rot.y;
+			worldTransform_.rotation_.y = LowerLimit(worldTransform_.rotation_.y, 0);
+		}
+		else if (worldTransform_.rotation_.y < 0) {
+			worldTransform_.rotation_.y += rot.y;
+			worldTransform_.rotation_.y = UpperLimit(worldTransform_.rotation_.y, 0);
+		}
+	}
+}
+
+void Player::Attack()
+{
+	if (input_->PushKey(DIK_SPACE)) {
+		// ’e‚ð¶¬‚µA‰Šú‰»
+		PlayerBullet* newBullet_ = new PlayerBullet();
+		newBullet_->Initialize(this->model_, worldTransform_.translation_);
+
+		// ’e‚ð”­ŽË‚·‚é
+		bullet_ = newBullet_;
+	}
+}
 
 void Player::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+	// ’e‚Ì•`‰æ
+	if (bullet_) {
+		bullet_->Draw(viewProjection);
+	}
 }

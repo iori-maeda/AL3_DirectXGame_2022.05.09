@@ -3,6 +3,9 @@
 #include"Model.h"
 #include <input/Input.h>
 #include <2d/DebugText.h>
+#include <scene/PlayerBullet/PlayerBullet.h>
+
+
 class Player
 {
 public:
@@ -17,6 +20,9 @@ public:
 	/// 更新
 	/// </summary>
 	void Update();
+
+	void Rotate(const Vector3& moveState, const Vector3& rotate);
+
 
 	/// <summary>
 	/// 描画
@@ -35,6 +41,12 @@ private:
 	Input* input_ = nullptr;
 	// デバッグテキスト
 	DebugText* debugText_ = nullptr;
+	// 弾
+	PlayerBullet* bullet_ = nullptr;
+	/// <summary>
+	/// 攻撃
+	/// </summary>
+	void Attack();
 
 public:
 	WorldTransform GetWorldTransform() { return worldTransform_; }
