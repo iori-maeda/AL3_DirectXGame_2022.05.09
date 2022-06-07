@@ -4,7 +4,8 @@
 #include <input/Input.h>
 #include <2d/DebugText.h>
 #include <scene/PlayerBullet/PlayerBullet.h>
-
+#include<memory>
+#include<list>
 
 class Player
 {
@@ -42,7 +43,7 @@ private:
 	// デバッグテキスト
 	DebugText* debugText_ = nullptr;
 	// 弾
-	PlayerBullet* bullet_ = nullptr;
+	std::list<std::unique_ptr<PlayerBullet>>bullets_;
 	/// <summary>
 	/// 攻撃
 	/// </summary>

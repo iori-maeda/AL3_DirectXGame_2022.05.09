@@ -44,8 +44,8 @@ void Player::Update() {
 	Attack();
 
 	// ’e‚ÌXV
-	if (bullet_) {
-		bullet_->Update();
+	for (auto& bullet : bullets_) {
+		bullet->Update();
 	}
 	
 	MatSyntheticZXY(worldTransform_);
@@ -93,11 +93,11 @@ void Player::Attack()
 {
 	if (input_->PushKey(DIK_SPACE)) {
 		// ’e‚ð¶¬‚µA‰Šú‰»
-		PlayerBullet* newBullet_ = new PlayerBullet();
-		newBullet_->Initialize(this->model_, worldTransform_.translation_);
+		std::unique_ptr<PlayerBullet>newBullet = std::make_unique<PlayerBullet>();
+		newBullet->Initialize(this->model_, worldTransform_.translation_);
 
 		// ’e‚ð”­ŽË‚·‚é
-		bullet_ = newBullet_;
+		bullets_.push_back(std::move(newBullet));
 	}
 }
 
@@ -105,7 +105,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
 	// ’e‚Ì•`‰æ
-	if (bullet_) {
-		bullet_->Draw(viewProjection);
+	for (auto& bullet : bullets_) {
+		bullet->Draw(viewProjection);
 	}
 }
