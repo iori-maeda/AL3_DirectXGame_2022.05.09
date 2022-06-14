@@ -3,6 +3,13 @@
 #include <math/Vector3.h>
 #include <3d/WorldTransform.h>
 
+// namespace 任意の名称　として
+// {} で囲うことで
+// stdのように　任意の名称::関数として　呼び出すことが出来る
+// ただしこの場合　usingnamespace で任意の名称を省略するか
+// 毎回　任意の名称:: とする必要がある
+
+
 // 円周率
 const float PI = 3.1415f;
 
@@ -20,6 +27,8 @@ Matrix4 MatRotZ(const float& rotZ);
 Matrix4 MatTrans(const Vector3& translation_);
 // 行列のZXY合成
 void MatSyntheticZXY(WorldTransform& worldTransform_);
+// 行列とベクトルの掛け算
+Vector3 MatMulti(const Vector3& vec, const Matrix4& mat);
 
 // ラジアンに変換
 float ConvartToRadian(const float degree);

@@ -3,7 +3,6 @@
 #include <cmath>
 #include"PrimitiveDrawer.h"
 
-
 // 関数群定義
 // スケーリング行列
 Matrix4 MatScaling(const Vector3& scale) {
@@ -70,6 +69,15 @@ void MatSyntheticZXY(WorldTransform& worldTransform_) {
 	worldTransform_.matWorld_ *= MatTrans(worldTransform_.translation_);
 	// 行列の転送
 	worldTransform_.TransferMatrix();
+}
+
+Vector3 MatMulti(const Vector3& vec, const Matrix4& mat) {
+	Vector3 vector;
+	vector.x = vec.x * mat.m[0][0] + vec.y * mat.m[1][0] + vec.z * mat.m[2][0];
+	vector.y = vec.x * mat.m[0][1] + vec.y * mat.m[1][1] + vec.z * mat.m[2][1];
+	vector.z = vec.x * mat.m[0][2] + vec.y * mat.m[1][2] + vec.z * mat.m[2][2];
+
+	return vector;
 }
 
 // ラジアンに変換

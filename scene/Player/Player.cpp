@@ -47,9 +47,14 @@ void Player::Update() {
 	for (auto& bullet : bullets_) {
 		bullet->Update();
 	}
+	// デスフラグの立った弾を削除
+	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet) {
+		return bullet->IsDead();
+		});
+
 	
 	MatSyntheticZXY(worldTransform_);
-	worldTransform_.translation_ += move;
+	//worldTransform_.translation_ += move;
 	worldTransform_.TransferMatrix();
 
 	// キャラクターの座標を画面表示する処理
@@ -92,9 +97,16 @@ void Player::Rotate(const Vector3& moveState, const Vector3& rotate) {
 void Player::Attack()
 {
 	if (input_->PushKey(DIK_SPACE)) {
+		// 弾速設定
+		const float kBulletSpeed = 1;
+		Vector3 velocity(0, 0, kBulletSpeed);
+
+		// 速度ベクトルを自機の向きに合わせて回転させる
+		velocity = MatMulti(velocity, worldTransform_.matWorld_);
+
 		// 弾を生成し、初期化
 		std::unique_ptr<PlayerBullet>newBullet = std::make_unique<PlayerBullet>();
-		newBullet->Initialize(this->model_, worldTransform_.translation_);
+		newBullet->Initialize(this->model_, worldTransform_.translation_, velocity);
 
 		// 弾を発射する
 		bullets_.push_back(std::move(newBullet));
