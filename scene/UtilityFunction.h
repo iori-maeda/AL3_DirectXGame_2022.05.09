@@ -49,3 +49,6 @@ void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen);
 
 // üŒ`•âŠ®
 float Lerp(const float& start, const float& end, float time);
+
+// ³•‰”»’è
+float Sign(float num);

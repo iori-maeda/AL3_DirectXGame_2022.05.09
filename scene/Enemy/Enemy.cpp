@@ -25,26 +25,40 @@ void Enemy::Initialize(Model* model)
 void Enemy::Update()
 {
 	// キャラクターの移動ベクトル
-	Vector3 move = { 0,0.05f,-0.5f };
+	velocity_ = { 0,0,0 };
 
 	// 移動範囲限定
-	const float kMoveLimitX = 35;
-	const float kMoveLimitY = 19;
-	const float kMoveLimitZ = 40;
+	const Vector3 kMoveLimit = { 35,19,40 };
+
+	switch (phaze_)
+	{
+	case Enemy::Phaze::Default:
+		MoveDefault(kMoveLimit);
+		break;
+	case Enemy::Phaze::Approach:
+		MoveApproach({ 0,0,0 });
+		break;
+	case Enemy::Phaze::Leave:
+		MoveLeave(kMoveLimit);
+		break;
+	default:
+		break;
+	}
+	
 
 	// 範囲限定処理
-	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -kMoveLimitX, kMoveLimitX);
-	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
-	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -kMoveLimitZ, kMoveLimitY);
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -kMoveLimit.x, kMoveLimit.x);
+	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -kMoveLimit.y, kMoveLimit.y);
+	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -kMoveLimit.z, kMoveLimit.z);
 
 	Vector3 rotate = { 0.5f,45,0.5f };
-	Rotate(move, rotate);
+	Rotate(velocity_, rotate);
 
 	// 攻撃処理
 	Attack();
 
 	MatSyntheticZXY(worldTransform_);
-	worldTransform_.translation_ += move;
+	worldTransform_.translation_ += velocity_;
 	worldTransform_.TransferMatrix();
 
 	// キャラクターの座標を画面表示する処理
@@ -87,6 +101,54 @@ void Enemy::Rotate(const Vector3& moveState, const Vector3& rotate)
 
 void Enemy::Attack()
 {
+}
+
+void Enemy::MoveDefault(const Vector3& limit)
+{
+	velocity_ = { 0,0,0 };
+	phaze_ = Phaze::Approach;
+}
+
+void Enemy::MoveApproach(const Vector3& limit)
+{
+	velocity_ = {
+		0.5f * Sign(0 - worldTransform_.translation_.x),
+		0.5f * Sign(0 - worldTransform_.translation_.y),
+		0.5f * Sign(0 - worldTransform_.translation_.z),
+	};
+	if (worldTransform_.translation_.x <= limit.x) {
+		velocity_.x = 0;
+	}
+	if (worldTransform_.translation_.y <= limit.y) {
+		velocity_.y = 0;
+	}
+	if (worldTransform_.translation_.z <= limit.z) {
+		velocity_.z = 0;
+	}
+	if (worldTransform_.translation_.x <= limit.x
+		&& worldTransform_.translation_.y <= limit.y
+		&& worldTransform_.translation_.z <= limit.z) {
+		phaze_ = Phaze::Leave;
+	}
+}
+
+void Enemy::MoveLeave(const Vector3& limit)
+{
+	velocity_ = { 0.5f,0.5f,0.5f };
+	if (worldTransform_.translation_.x >= limit.x) {
+		velocity_.x = 0;
+	}
+	if (worldTransform_.translation_.y >= limit.y) {
+		velocity_.y = 0;
+	}
+	if (worldTransform_.translation_.z >= limit.z) {
+		velocity_.z = 0;
+	}
+	if (worldTransform_.translation_.x >= limit.x
+		&& worldTransform_.translation_.y >= limit.y
+		&& worldTransform_.translation_.z >= limit.z) {
+		phaze_ = Phaze::Default;
+	}
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection)

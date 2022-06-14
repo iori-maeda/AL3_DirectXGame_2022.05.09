@@ -138,3 +138,14 @@ void DrawXYZLine3DRGB(const Vector3& startPos, const Vector3& endPosLen) {
 float Lerp(const float& start, const float& end, float time) {
 	return start + time * (end - start);
 }
+
+float Sign(float num)
+{
+	if (num < 0) {
+		return -1;
+	}
+	if (num > 0) {
+		return 1;
+	}
+	return 0;
+}

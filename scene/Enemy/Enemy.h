@@ -36,6 +36,8 @@ private:
 	Input* input_ = nullptr;
 	// デバッグテキスト
 	DebugText* debugText_ = nullptr;
+	// 移動速度
+	Vector3 velocity_;
 	// 弾
 	//std::list<std::unique_ptr<EnemyBullet>>bullets_;
 	/// <summary>
@@ -44,6 +46,23 @@ private:
 	void Attack();
 
 public:
+	// ゲッター
 	WorldTransform GetWorldTransform() { return worldTransform_; }
+
+
+public:
+	// 行動フェーズ
+	enum class Phaze {
+		Default,		// 初期
+		Approach,		// 接近
+		Leave,			// 離脱
+	};
+
+	void MoveDefault(const Vector3& limit);
+	void MoveApproach(const Vector3& limit);
+	void MoveLeave(const Vector3& limit);
+private:
+	// フェーズ
+	Phaze phaze_ = Phaze::Default;
 };
 
