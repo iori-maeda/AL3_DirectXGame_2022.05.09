@@ -98,6 +98,7 @@
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scene\Enemy\Enemy.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\PlayerBullet\PlayerBullet.cpp" />
     <ClCompile Include="scene\Player\Player.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
+    <ClInclude Include="scene\Enemy\Enemy.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\PlayerBullet\PlayerBullet.h" />
     <ClInclude Include="scene\Player\Player.h" />

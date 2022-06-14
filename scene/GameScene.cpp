@@ -11,7 +11,6 @@ GameScene::GameScene() {}
 GameScene::~GameScene() { 
 	delete model_;
 	delete debugCamera_;
-	delete player_;
 }
 
 void GameScene::Initialize() {
@@ -35,15 +34,19 @@ void GameScene::Initialize() {
 	// ライン描画が参照するビュープロジェクションの指定(アドレス渡し)
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
 
-	// 自キャラの生成
-	player_ = new Player();
 	// 自キャラの初期化
 	player_->Initialize(model_, textureHandle_);
+
+	// 敵キャラの初期化
+	enemy_->Initialize(model_);
 }
 
 void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
+
+	// 敵キャラの更新
+	enemy_->Update();
 
 #ifdef _DEBUG
 	if (input_->PushKey(DIK_LSHIFT) || input_->PushKey(DIK_RSHIFT)) {
@@ -116,6 +119,8 @@ void GameScene::Draw() {
 	else {
 		player_->Draw(viewProjection_);
 	}
+
+	enemy_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

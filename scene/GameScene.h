@@ -11,7 +11,9 @@
 #include "WorldTransform.h"
 
 #include"../scene/Player/Player.h"
+#include"../scene/Enemy/Enemy.h"
 #include <3d/DebugCamera.h>
+#include<memory>
 
 /// <summary>
 /// ゲームシーン
@@ -65,7 +67,10 @@ class GameScene {
 	DebugCamera* debugCamera_ = nullptr;
 
 	// 自キャラ
-	Player* player_ = nullptr;
+	std::unique_ptr<Player> player_ = std::make_unique<Player>();
+
+	// 敵キャラ
+	std::unique_ptr<Enemy>enemy_ = std::make_unique<Enemy>();
 
 	// デバッグカメラ有効判定
 	bool isDubugCameraActive_ = false;
