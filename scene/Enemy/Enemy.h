@@ -2,6 +2,7 @@
 #include <3d/Model.h>
 #include <input/Input.h>
 #include <2d/DebugText.h>
+#include <EnemyBullet.h>
 class Enemy
 {
 public:
@@ -39,11 +40,18 @@ private:
 	// 移動速度
 	Vector3 velocity_;
 	// 弾
-	//std::list<std::unique_ptr<EnemyBullet>>bullets_;
+	std::list<std::unique_ptr<EnemyBullet>>bullets_;
 	/// <summary>
 	/// 攻撃
 	/// </summary>
-	void Attack();
+	void Fire();
+
+public:
+	// 発射間隔
+	static const int kFireInterVal = 10;
+private:
+	// 発射タイマー
+	int32_t fireTimer = 0;
 
 public:
 	// ゲッター
@@ -57,6 +65,9 @@ public:
 		Approach,		// 接近
 		Leave,			// 離脱
 	};
+
+	// 接近フェーズ初期化
+	void MoveApproachInitialize();
 
 	void MoveDefault(const Vector3& limit);
 	void MoveApproach(const Vector3& limit);

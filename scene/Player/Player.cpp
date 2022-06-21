@@ -54,7 +54,7 @@ void Player::Update() {
 
 	
 	MatSyntheticZXY(worldTransform_);
-	//worldTransform_.translation_ += move;
+	worldTransform_.translation_ += move;
 	worldTransform_.TransferMatrix();
 
 	// キャラクターの座標を画面表示する処理
@@ -99,7 +99,7 @@ void Player::Attack()
 	if (input_->PushKey(DIK_SPACE)) {
 		// 弾速設定
 		const float kBulletSpeed = 1;
-		Vector3 velocity(0, 0, kBulletSpeed);
+		Vector3 velocity(0, kBulletSpeed / 2, kBulletSpeed);
 
 		// 速度ベクトルを自機の向きに合わせて回転させる
 		velocity = MatMulti(velocity, worldTransform_.matWorld_);

@@ -105,6 +105,7 @@ void GameScene::Draw() {
 	// 自キャラの描画 
 	if (isDubugCameraActive_) {
 		player_->Draw(debugCamera_->GetViewProjection());
+		enemy_->Draw(debugCamera_->GetViewProjection());
 		Vector3 startPos = {
 			player_->GetWorldTransform().translation_.x,
 			player_->GetWorldTransform().translation_.y,
@@ -118,9 +119,8 @@ void GameScene::Draw() {
 	}
 	else {
 		player_->Draw(viewProjection_);
+		enemy_->Draw(viewProjection_);
 	}
-
-	enemy_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

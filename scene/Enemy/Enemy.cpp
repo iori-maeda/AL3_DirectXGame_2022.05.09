@@ -11,7 +11,7 @@ void Enemy::Initialize(Model* model)
 	// 引数として受け取ったデータをメンバ変数に記録する
 	this->model_ = model;
 	// テクスチャを読み込み
-	textureHandle_ = TextureManager::Load("test_ball.png");
+	textureHandle_ = TextureManager::Load("beta+a.png");
 
 	// シングルトンインスタンスを取得する
 	input_ = Input::GetInstance();
@@ -54,8 +54,11 @@ void Enemy::Update()
 	Vector3 rotate = { 0.5f,45,0.5f };
 	Rotate(velocity_, rotate);
 
-	// 攻撃処理
-	Attack();
+
+	// 弾の更新
+	for (auto& bullet : bullets_) {
+		bullet->Update();
+	}
 
 	MatSyntheticZXY(worldTransform_);
 	worldTransform_.translation_ += velocity_;
@@ -99,18 +102,49 @@ void Enemy::Rotate(const Vector3& moveState, const Vector3& rotate)
 	}
 }
 
-void Enemy::Attack()
+void Enemy::Fire()
 {
+	// 弾速設定
+	const float kBulletSpeed = 1;
+	Vector3 velocity(0, 0, -kBulletSpeed);
+
+	// 速度ベクトルを自機の向きに合わせて回転させる
+	velocity = MatMulti(velocity, worldTransform_.matWorld_);
+
+	// 弾を生成し、初期化
+	std::unique_ptr<EnemyBullet>newBullet = std::make_unique<EnemyBullet>();
+	newBullet->Initialize(this->model_, worldTransform_.translation_, velocity);
+
+	// 弾を発射する
+	bullets_.push_back(std::move(newBullet));
+}
+
+void Enemy::MoveApproachInitialize()
+{
+	// 発射タイマーを初期化
+	fireTimer = kFireInterVal;
 }
 
 void Enemy::MoveDefault(const Vector3& limit)
 {
 	velocity_ = { 0,0,0 };
 	phaze_ = Phaze::Approach;
+
+	//接近フェーズ初期化
+	MoveApproachInitialize();
 }
 
 void Enemy::MoveApproach(const Vector3& limit)
 {
+	// 発射タイマーカウントダウン
+	fireTimer--;
+	// 指定時間に達した
+	if (fireTimer < 0) {
+		// 攻撃処理
+		Fire();
+		// 発射タイマー初期化
+		fireTimer = kFireInterVal;
+	}
 	velocity_ = {
 		0.5f * Sign(0 - worldTransform_.translation_.x),
 		0.5f * Sign(0 - worldTransform_.translation_.y),
@@ -154,5 +188,8 @@ void Enemy::MoveLeave(const Vector3& limit)
 void Enemy::Draw(const ViewProjection& viewProjection)
 {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	for (auto& bullet : bullets_) {
+ 		bullet->Draw(viewProjection);
+	}
 }
 
