@@ -31,13 +31,15 @@ void Enemy::Update()
 	// 移動範囲限定
 	const Vector3 kMoveLimit = { 35,19,40 };
 
+	Vector3 playerPos = player_->GetWorldTransform().translation_;
+
 	switch (phaze_)
 	{
 	case Enemy::Phaze::Default:
 		MoveDefault(kMoveLimit);
 		break;
 	case Enemy::Phaze::Approach:
-		MoveApproach({ 0,0,0 });
+		MoveApproach(playerPos);
 		break;
 	case Enemy::Phaze::Leave:
 		MoveLeave(kMoveLimit);
@@ -159,10 +161,11 @@ void Enemy::MoveApproach(const Vector3& limit)
 		// 発射タイマー初期化
 		fireTimer = kFireInterVal;
 	}
+
 	velocity_ = {
-		0.5f * Sign(0 - worldTransform_.translation_.x),
-		0.5f * Sign(0 - worldTransform_.translation_.y),
-		0.5f * Sign(0 - worldTransform_.translation_.z),
+		0.5f * Sign(limit.x - worldTransform_.translation_.x),
+		0.5f * Sign(limit.y - worldTransform_.translation_.y),
+		0.5f * Sign(limit.z - worldTransform_.translation_.z),
 	};
 	if (worldTransform_.translation_.x <= limit.x) {
 		velocity_.x = 0;
