@@ -10,6 +10,11 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 
+
+#include <scene/Player/Player.h>
+#include <scene/Enemy/Enemy.h>
+#include <3d/DebugCamera.h>
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -50,4 +55,23 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	
+	// テクスチャハンドル
+	uint32_t textureHandle_ = 0;
+	// 3Dモデル
+	Model* model_ = nullptr;
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+	// ワールドトランスフォーム
+	WorldTransform worldTransform_;
+	// デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
+	// デバッグカメラの有効判定
+	bool isDebugCameraActive_ = false;
+
+	// 自キャラ
+	std::unique_ptr<Player>player_ = std::make_unique<Player>();
+
+	// 敵キャラ
+	std::unique_ptr<Enemy>enemy_ = std::make_unique<Enemy>();
 };

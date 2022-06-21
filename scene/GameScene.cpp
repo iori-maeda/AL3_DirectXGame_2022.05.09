@@ -1,43 +1,15 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-
-// 円周率
-const float PI = 3.1415f;
-
-
-// 関数群プロトタイプ宣言
-// スケーリング行列
-Matrix4 MatScaling(const Vector3& scale);
-// X軸回転行列
-Matrix4 MatRotX(const float& rotX);
-// Y軸回転行列
-Matrix4 MatRotY(const float& rotY);
-// Z軸回転行列
-Matrix4 MatRotZ(const float& rotZ);
-// 平行移動行列
-Matrix4 MatTrans(const Vector3& translation_);
-// 行列のZXY合成
-void MatSyntheticZXY(WorldTransform& worldTransform_);
-
-// ラジアンに変換
-float ConvartToRadian(const float degree) {
-	return (degree * PI) / 180;
-}
-float ConvartToDegree(const float radian) {
-	return radian * 180 / PI;
-}
-
-// 限界値設定
-float UpperLimit(const float& num, const float& limit);
-float LowerLimit(const float& num, const float& limit);
-float Clamp(const float& num, const float& min, const float& max);
-
+#include <3d/PrimitiveDrawer.h>
+#include <scene/UtilityFunction.h>
 
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete model_;
+}
 
 void GameScene::Initialize() {
 
@@ -45,9 +17,58 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	// ファイル名を指定してテクスチャを読み込む
+	textureHandle_ = TextureManager::Load("mario.jpg");
+	// 3Dモデル生成
+	model_ = Model::Create();
+	// ビュープロジェクションの初期化
+	viewProjection_.Initialize();
+
+	// デバッグカメラの生成
+	const int WIN_WIDTH = 1280;
+	const int WIN_HEIGHT = 720;
+	debugCamera_ = new DebugCamera(WIN_WIDTH, WIN_HEIGHT);
+	// ライン描画が参照するビュープロジェクション(アドレス渡し)
+	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
+	// ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+
+	// 自キャラ初期化
+	player_->Initialize(model_, textureHandle_);
+	// 敵キャラ初期化
+	enemy_->Initialize(model_);
+	enemy_->SetPlayer(player_.get());
+
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	// 自キャラ更新
+	player_->Update();
+	// 敵キャラ更新
+	enemy_->Update();
+
+	if (input_->PushKey(DIK_LSHIFT) || input_->PushKey(DIK_RSHIFT)) {
+		if (input_->TriggerKey(DIK_D)) {
+			if (isDebugCameraActive_ == false) {
+				isDebugCameraActive_ = true;
+			}
+			else {
+				isDebugCameraActive_ = false;
+			}
+		}
+	}
+	if (isDebugCameraActive_) {
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	}
+	else {
+		viewProjection_.UpdateMatrix();
+		viewProjection_.TransferMatrix();
+	}
+}
 
 void GameScene::Draw() {
 
@@ -75,6 +96,26 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	if (isDebugCameraActive_) {
+		player_->Draw(debugCamera_->GetViewProjection());
+		enemy_->Draw(debugCamera_->GetViewProjection());
+		Vector3 startPos = {
+			player_->GetWorldTransform().translation_.x,
+			player_->GetWorldTransform().translation_.y,
+			player_->GetWorldTransform().translation_.z,
+		};
+		Vector3 endPos = {
+			startPos.x + 50,
+			startPos.y + 50,
+			startPos.z + 50,
+		};
+		DrawXYZLine3DRGB(startPos, endPos);
+	}
+	else {
+		player_->Draw(viewProjection_);
+		enemy_->Draw(viewProjection_);
+	}
+
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -95,90 +136,4 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
-}
-
-
-// 関数群定義
-// スケーリング行列
-Matrix4 MatScaling(const Vector3& scale) {
-	Matrix4 matScale;
-	matScale.m[0][0] = scale.x;
-	matScale.m[1][1] = scale.y;
-	matScale.m[2][2] = scale.z;
-	matScale.m[3][3] = 1;
-
-	return matScale;
-}
-// X軸回転行列
-Matrix4 MatRotX(const float& rotX) {
-	// X軸回転行列を宣言
-	// 単位行列を代入
-	Matrix4 matRotX = MathUtility::Matrix4Identity();
-	// X軸回転行列の各要素を設定
-	matRotX.m[1][1] = cos(rotX);
-	matRotX.m[1][2] = sin(rotX);
-	matRotX.m[2][1] = -sin(rotX);
-	matRotX.m[2][2] = cos(rotX);
-	return matRotX;
-}
-// Y軸回転行列
-Matrix4 MatRotY(const float& rotY) {
-	// Y軸回転行列を宣言
-	Matrix4 matRotY = MathUtility::Matrix4Identity();
-	// Y軸回転行列の各要素を設定
-	matRotY.m[0][0] = cos(rotY);
-	matRotY.m[0][2] = -sin(rotY);
-	matRotY.m[2][0] = sin(rotY);
-	matRotY.m[2][2] = cos(rotY);
-	return matRotY;
-}
-// Z軸回転行列
-Matrix4 MatRotZ(const float& rotZ) {
-	// Z軸回転行列を宣言
-	Matrix4 matRotZ = MathUtility::Matrix4Identity();
-	// Z軸回転行列の各要素を設定
-	matRotZ.m[0][0] = cos(rotZ);
-	matRotZ.m[0][1] = sin(rotZ);
-	matRotZ.m[1][0] = -sin(rotZ);
-	matRotZ.m[1][1] = cos(rotZ);
-	return matRotZ;
-}
-
-Matrix4 MatTrans(const Vector3& translation_) {
-
-	Matrix4 matTrans = MathUtility::Matrix4Identity();
-
-	matTrans.m[3][0] = translation_.x;
-	matTrans.m[3][1] = translation_.y;
-	matTrans.m[3][2] = translation_.z;
-	return matTrans;
-}
-
-void MatSyntheticZXY(WorldTransform& worldTransform_) {
-	// 行列の合成
-	worldTransform_.matWorld_ = MathUtility::Matrix4Identity();
-	worldTransform_.matWorld_ *= MatScaling(worldTransform_.scale_);
-	worldTransform_.matWorld_ *= MatRotZ(worldTransform_.rotation_.z);
-	worldTransform_.matWorld_ *= MatRotX(worldTransform_.rotation_.x);
-	worldTransform_.matWorld_ *= MatRotY(worldTransform_.rotation_.y);
-	worldTransform_.matWorld_ *= MatTrans(worldTransform_.translation_);
-	// 行列の転送
-	worldTransform_.TransferMatrix();
-}
-
-// 限界値設定関数
-float UpperLimit(const float& num, const float& limit) {
-	if (num >= limit)return limit;
-	return num;
-}
-
-float LowerLimit(const float& num, const float& limit) {
-	if (num <= limit)return limit;
-	return num;
-}
-
-float Clamp(const float& num, const float& min, const float& max) {
-	if (num <= min) return min;
-	else if (num >= max)return max;
-	return num;
 }
