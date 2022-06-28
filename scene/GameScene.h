@@ -41,6 +41,8 @@ class GameScene {
 	/// </summary>
 	void Update();
 
+	void CheckAllCollisions();
+
 	/// <summary>
 	/// 描画
 	/// </summary>

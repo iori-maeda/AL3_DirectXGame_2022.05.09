@@ -17,6 +17,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
@@ -38,5 +43,8 @@ private:
 public:
 	// ゲッター
 	bool IsDead() const { return isDead_; }
+	// ワールド座標の取得
+	Vector3 GetWorldPosition();
+	
 };
 

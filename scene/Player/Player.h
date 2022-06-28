@@ -30,11 +30,9 @@ public:
 	void Rotate(const Vector3& moveState, const Vector3& rotate);
 
 	/// <summary>
-	/// ワールド座標を取得
+	/// 衝突を検出したら呼び出されるコールバック関数
 	/// </summary>
-	/// <returns></returns>
-	Vector3 GetWorldPosition();
-
+	void OnCollision();
 
 	/// <summary>
 	/// 描画
@@ -61,6 +59,12 @@ private:
 	void Attack();
 
 public:
+	// ゲッター
 	WorldTransform GetWorldTransform() { return worldTransform_; }
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
+	// セッター
+	const std::list<std::unique_ptr<PlayerBullet>>& GetBullet() { return bullets_; }
 };
 

@@ -27,8 +27,10 @@ public:
 	/// <param name="rotate"></param>
 	void Rotate(const Vector3& moveState, const Vector3& rotate);
 
-	
-	Vector3 GetWorldPosition();
+	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
 
 
 	/// <summary>
@@ -71,6 +73,12 @@ private:
 public:
 	// ゲッター
 	WorldTransform GetWorldTransform() { return worldTransform_; }
+	// ワールド座標の取得
+	Vector3 GetWorldPosition();
+	// 弾リストの取得
+	const std::list<std::unique_ptr<EnemyBullet>>& GetBullet() { return bullets_; }
+
+	// セッター
 	void SetPlayer(Player* player) { player_ = player; }
 
 public:

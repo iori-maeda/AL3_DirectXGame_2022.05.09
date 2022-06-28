@@ -12,6 +12,11 @@ public:
 	void Initialize(Model* model, const Vector3& position, const Vector3& velocity);
 
 	/// <summary>
+	/// 衝突を検出したら呼び出されるコールバック関数
+	/// </summary>
+	void OnCollision();
+
+	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update();
@@ -38,4 +43,7 @@ private:
 public:
 	// ゲッター
 	bool IsDead() const { return isDead_; }
+	// ワールド座標の取得
+	Vector3 GetWorldPosition();
+
 };

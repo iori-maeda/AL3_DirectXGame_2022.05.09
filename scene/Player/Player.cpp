@@ -90,15 +90,8 @@ void Player::Rotate(const Vector3& moveState, const Vector3& rotate) {
 	}
 }
 
-Vector3 Player::GetWorldPosition()
+void Player::OnCollision()
 {
-	// ワールド座標を入れる変数
-	Vector3 worldPos;
-	// ワールド行列の平行移動成分を取得(ワールド座標)
-	worldPos.x = worldTransform_.matWorld_.m[3][0];
-	worldPos.y = worldTransform_.matWorld_.m[3][1];
-	worldPos.z = worldTransform_.matWorld_.m[3][2];
-	return worldPos;
 }
 
 void Player::Attack()
@@ -106,7 +99,7 @@ void Player::Attack()
 	if (input_->PushKey(DIK_SPACE)) {
 		// 弾速設定
 		const float kBulletSpeed = 1;
-		Vector3 velocity(0, kBulletSpeed / 2, kBulletSpeed);
+		Vector3 velocity(0, 0, kBulletSpeed);
 
 		// 速度ベクトルを自機の向きに合わせて回転させる
 		velocity = MatMulti(velocity, worldTransform_.matWorld_);
@@ -127,4 +120,16 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	for (auto& bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+}
+
+// ゲッター？
+Vector3 Player::GetWorldPosition()
+{
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+	// ワールド行列の平行移動成分を取得(ワールド座標)
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+	return worldPos;
 }

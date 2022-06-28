@@ -67,6 +67,11 @@ void Enemy::Update()
 	worldTransform_.translation_ += velocity_;
 	worldTransform_.TransferMatrix();
 
+	// デスフラグの立った弾を削除
+	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
+		return bullet->IsDead();
+		});
+
 	// キャラクターの座標を画面表示する処理
 	debugText_->SetPos(50, 200);
 	debugText_->Printf(
@@ -102,16 +107,8 @@ void Enemy::Rotate(const Vector3& moveState, const Vector3& rotate)
 	}
 }
 
-Vector3 Enemy::GetWorldPosition()
+void Enemy::OnCollision()
 {
-	// ワールド座標を入れる変数
-	Vector3 worldPos;
-	// ワールド行列の平行移動成分を取得(ワールド座標)
-	worldPos.x = worldTransform_.matWorld_.m[3][0];
-	worldPos.y = worldTransform_.matWorld_.m[3][1];
-	worldPos.z = worldTransform_.matWorld_.m[3][2];
-
-	return worldPos;
 }
 
 void Enemy::Fire()
@@ -161,12 +158,13 @@ void Enemy::MoveApproach(const Vector3& limit)
 		// 発射タイマー初期化
 		fireTimer = kFireInterVal;
 	}
-
 	velocity_ = {
 		0.5f * Sign(limit.x - worldTransform_.translation_.x),
 		0.5f * Sign(limit.y - worldTransform_.translation_.y),
 		0.5f * Sign(limit.z - worldTransform_.translation_.z),
 	};
+
+	velocity_ = { 0,0,0 };
 	if (worldTransform_.translation_.x <= limit.x) {
 		velocity_.x = 0;
 	}
@@ -210,3 +208,17 @@ void Enemy::Draw(const ViewProjection& viewProjection)
 	}
 }
 
+
+
+// ゲッター？
+Vector3 Enemy::GetWorldPosition()
+{
+	// ワールド座標を入れる変数
+	Vector3 worldPos;
+	// ワールド行列の平行移動成分を取得(ワールド座標)
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+}
