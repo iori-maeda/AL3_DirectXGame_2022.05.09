@@ -21,6 +21,8 @@ void Enemy::Initialize(Model* model)
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = { 0,0,0 };
+
+	//*movePhazeTable = &Enemy::MoveDefault;
 }
 
 void Enemy::Update()
@@ -33,21 +35,26 @@ void Enemy::Update()
 
 	Vector3 playerPos = player_->GetWorldTransform().translation_;
 
-	switch (phaze_)
-	{
-	case Enemy::Phaze::Default:
-		MoveDefault(kMoveLimit);
-		break;
-	case Enemy::Phaze::Approach:
-		MoveApproach(playerPos);
-		break;
-	case Enemy::Phaze::Leave:
-		MoveLeave(kMoveLimit);
-		break;
-	default:
-		break;
+	//switch (phaze_)
+	//{
+	//case Enemy::Phaze::Default:
+	//	MoveDefault(kMoveLimit);
+	//	break;
+	//case Enemy::Phaze::Approach:
+	//	MoveApproach(playerPos);
+	//	break;
+	//case Enemy::Phaze::Leave:
+	//	MoveLeave(kMoveLimit);
+	//	break;
+	//default:
+	//	break;
+	//}
+	if (phaze_ == Phaze::Approach) {
+		(this->*movePhazeTable[static_cast<size_t>(Phaze::Approach)])(player_->GetWorldTransform().translation_);
 	}
-	
+	else {
+		(this->*movePhazeTable[static_cast<size_t>(phaze_)])(kMoveLimit);
+	}
 
 	// 範囲限定処理
 	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -kMoveLimit.x, kMoveLimit.x);
@@ -132,6 +139,15 @@ void Enemy::Fire()
 	bullets_.push_back(std::move(newBullet));
 }
 
+
+void Enemy::Draw(const ViewProjection& viewProjection)
+{
+	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	for (auto& bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
+}
+
 void Enemy::MoveApproachInitialize()
 {
 	// 発射タイマーを初期化
@@ -164,7 +180,6 @@ void Enemy::MoveApproach(const Vector3& limit)
 		0.5f * Sign(limit.z - worldTransform_.translation_.z),
 	};
 
-	velocity_ = { 0,0,0 };
 	if (worldTransform_.translation_.x <= limit.x) {
 		velocity_.x = 0;
 	}
@@ -200,13 +215,13 @@ void Enemy::MoveLeave(const Vector3& limit)
 	}
 }
 
-void Enemy::Draw(const ViewProjection& viewProjection)
-{
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
-	for (auto& bullet : bullets_) {
- 		bullet->Draw(viewProjection);
-	}
-}
+// staticで宣言したメンバ関数ポインタテーブルの実体
+void (Enemy::* Enemy::movePhazeTable[])(const Vector3& limit) = {
+	&Enemy::MoveDefault,
+	&Enemy::MoveApproach,
+	&Enemy::MoveLeave
+};
+
 
 
 

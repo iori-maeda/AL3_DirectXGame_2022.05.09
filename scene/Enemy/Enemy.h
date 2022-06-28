@@ -99,5 +99,8 @@ public:
 private:
 	// フェーズ
 	Phaze phaze_ = Phaze::Default;
+
+	// メンバ関数ポインタ
+	static void (Enemy::* movePhazeTable[])(const Vector3& limit);
 };
 
