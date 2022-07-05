@@ -29,6 +29,9 @@ void Player::Update() {
 	if (input_->PushKey(DIK_W))move.y = 0.5f;
 	else if (input_->PushKey(DIK_S))move.y = -0.5f;
 
+	if (input_->PushKey(DIK_UP))move.z = 0.5f;
+	else if (input_->PushKey(DIK_DOWN))move.z = -0.5f;
+
 	// ˆÚ“®”ÍˆÍŒÀ’è
 	const float kMoveLimitX = 35;
 	const float kMoveLimitY = 19;

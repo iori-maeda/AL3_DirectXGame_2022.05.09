@@ -20,7 +20,7 @@ void Enemy::Initialize(Model* model)
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = { 0,0,0 };
+	worldTransform_.translation_ = { 100,100,0 };
 
 	//*movePhazeTable = &Enemy::MoveDefault;
 }

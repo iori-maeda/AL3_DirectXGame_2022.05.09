@@ -9,6 +9,7 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete model_;
+	delete modelSkydome_;
 }
 
 void GameScene::Initialize() {
@@ -40,6 +41,10 @@ void GameScene::Initialize() {
 	enemy_->Initialize(model_);
 	enemy_->SetPlayer(player_.get());
 
+	// 天球3Dモデル生成
+	modelSkydome_ = Model::CreateFromOBJ("SkyDorm_test", true);
+	// 天球初期化
+	skydome->Initialize(modelSkydome_);
 }
 
 void GameScene::Update() {
@@ -47,6 +52,8 @@ void GameScene::Update() {
 	player_->Update();
 	// 敵キャラ更新
 	enemy_->Update();
+	// 天球更新
+	skydome->Update();
 
 	// 衝突判定チェック
 	CheckAllCollisions();
@@ -205,6 +212,7 @@ void GameScene::Draw() {
 	if (isDebugCameraActive_) {
 		player_->Draw(debugCamera_->GetViewProjection());
 		enemy_->Draw(debugCamera_->GetViewProjection());
+		skydome->Draw(debugCamera_->GetViewProjection());
 		Vector3 startPos = {
 			player_->GetWorldTransform().translation_.x,
 			player_->GetWorldTransform().translation_.y,
@@ -220,8 +228,10 @@ void GameScene::Draw() {
 	else {
 		player_->Draw(viewProjection_);
 		enemy_->Draw(viewProjection_);
-	}
 
+		// 天球描画
+		skydome->Draw(viewProjection_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
