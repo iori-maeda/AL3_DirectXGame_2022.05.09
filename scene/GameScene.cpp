@@ -1,8 +1,8 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-#include <3d/PrimitiveDrawer.h>
-#include <scene/UtilityFunction.h>
+#include "3d/PrimitiveDrawer.h"
+#include "scene/UtilityFunction.h"
 
 
 GameScene::GameScene() {}
@@ -10,6 +10,7 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete model_;
 	delete modelSkydome_;
+	delete debugCamera_;
 }
 
 void GameScene::Initialize() {
